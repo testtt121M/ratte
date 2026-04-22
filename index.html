@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
 <meta name="apple-mobile-web-app-title" content="Rate It">
@@ -11,33 +11,35 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 :root{
   --bg:#0d0d0f;--card:#1c1c1e;--card2:#2c2c2e;--accent:#ffd60a;--text:#fff;--sub:#8e8e93;
-  --green:#30d158;--red:#ff453a;--gray:#48484a;--blue:#0a84ff;--radius:16px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --green:#30d158;--red:#ff453a;--gray:#48484a;--blue:#0a84ff;--purple:#bf5af2;--pink:#ff375f;--orange:#ff9f0a;--teal:#64d2ff;
+  --radius:16px;--safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
 }
 html,body{height:100%;overscroll-behavior:none}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Display",sans-serif;max-width:430px;margin:0 auto;position:relative;overflow-x:hidden}
 
 /* NAV */
-.nav{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;background:rgba(13,13,15,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:200}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + var(--safe-top)) 20px 12px;background:rgba(13,13,15,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:200}
 .nav-title{font-size:20px;font-weight:700;letter-spacing:-.3px}
 .mode-pill{display:flex;background:var(--card2);border-radius:20px;padding:3px;gap:2px}
 .mode-pill button{border:none;padding:6px 14px;border-radius:17px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--sub);background:none}
 .mode-pill button.active{background:var(--accent);color:#000}
 
 /* TABS */
-.tabs{display:flex;background:var(--bg);border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:57px;z-index:100}
+.tabs{display:flex;background:var(--bg);border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex-shrink:0;padding:12px 18px;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
 
-/* SCROLL CONTENT */
-.scroll-content{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(30px + var(--safe-bottom))}
-.view{display:none;padding:16px}
+.view{display:none;padding:16px;padding-bottom:calc(30px + var(--safe-bottom))}
 .view.active{display:block}
 
 /* UPLOAD */
-.upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:20px;padding:36px 20px;text-align:center;cursor:pointer;margin-bottom:20px;background:rgba(255,255,255,.03);transition:all .2s;active:scale(.97)}
+.upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:20px;padding:36px 20px;text-align:center;cursor:pointer;margin-bottom:20px;background:rgba(255,255,255,.03);transition:all .2s}
 .upload-zone:active{border-color:var(--accent);background:rgba(255,214,10,.05)}
+.upload-zone.compact{padding:14px;display:flex;align-items:center;gap:12px;text-align:left}
+.upload-zone.compact .icon{font-size:22px;margin:0}
+.upload-zone.compact .u-title{font-size:14px}
+.upload-zone.compact .u-sub{font-size:12px}
 .upload-zone .icon{font-size:36px;margin-bottom:10px}
 .upload-zone .u-title{font-size:16px;font-weight:600;margin-bottom:4px}
 .upload-zone .u-sub{color:var(--sub);font-size:13px}
@@ -54,96 +56,107 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Di
 .photo-card-caption::placeholder{color:var(--sub)}
 .del-btn{background:rgba(255,69,58,.15);border:none;color:var(--red);font-size:16px;cursor:pointer;padding:8px 10px;border-radius:10px;flex-shrink:0}
 
-/* RATING FULLSCREEN */
-#ratingView{padding:0}
+/* RATING */
 .rating-wrap{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column}
 .rating-img-area{flex:1;position:relative;overflow:hidden}
 .rating-img-area img{width:100%;height:100%;object-fit:contain}
-.r-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.1)}
+.r-progress{position:absolute;top:calc(0px + var(--safe-top));left:0;right:0;height:3px;background:rgba(255,255,255,.1);z-index:5}
 .r-progress-fill{height:100%;background:var(--accent);transition:width .4s ease}
-.r-counter{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600}
-.caption-bar{position:absolute;left:0;right:0;touch-action:none;cursor:grab}
+.r-counter{position:absolute;top:calc(14px + var(--safe-top));right:16px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);padding:7px 14px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:.5px;z-index:5}
+.caption-bar{position:absolute;left:0;right:0;touch-action:none;cursor:grab;z-index:4}
 .caption-bar span{background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:#fff;font-size:24px;font-weight:800;padding:12px 20px;display:block;width:100%;word-break:break-word;text-shadow:0 1px 8px rgba(0,0,0,.8);letter-spacing:-.2px}
 .reaction-area{background:rgba(13,13,15,.95);backdrop-filter:blur(20px);padding:20px 20px calc(20px + var(--safe-bottom));border-top:1px solid rgba(255,255,255,.06)}
 .react-btns{display:flex;justify-content:space-around;align-items:center}
-.react-btn{font-size:54px;background:none;border:none;cursor:pointer;padding:8px 16px;border-radius:20px;transition:transform .15s,background .15s;-webkit-user-select:none}
+.react-btn{font-size:54px;background:none;border:none;cursor:pointer;padding:8px 16px;border-radius:20px;transition:transform .15s,background .15s}
 .react-btn:active{transform:scale(.8);background:rgba(255,255,255,.08)}
 
 /* SCREENS */
-.center-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100dvh - 57px);gap:14px;padding:32px 24px;text-align:center}
-.s-icon{font-size:72px;line-height:1;margin-bottom:4px}
+.center-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100dvh - 110px);gap:14px;padding:32px 24px;text-align:center}
+.s-icon{font-size:72px;line-height:1}
 .s-title{font-size:26px;font-weight:700;letter-spacing:-.5px}
 .s-sub{color:var(--sub);font-size:16px;line-height:1.5;max-width:280px}
 .s-btn{background:var(--accent);color:#000;border:none;padding:16px 44px;border-radius:50px;font-size:17px;font-weight:700;cursor:pointer;margin-top:4px;letter-spacing:-.2px}
 .s-btn-sec{background:var(--card2);color:var(--text);border:none;padding:14px 32px;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer}
 
 /* CONGRATS */
-.congrats-wrap{display:flex;flex-direction:column;align-items:center;min-height:calc(100dvh - 57px);padding:40px 24px calc(40px + var(--safe-bottom));text-align:center;gap:14px}
+.congrats-wrap{display:flex;flex-direction:column;align-items:center;min-height:100dvh;padding:calc(40px + var(--safe-top)) 24px calc(40px + var(--safe-bottom));text-align:center;gap:14px;position:relative;overflow:hidden}
 .score-row{display:flex;gap:10px;justify-content:center;margin:4px 0}
 .score-chip{padding:8px 18px;border-radius:50px;font-size:15px;font-weight:600}
 .chip-up{background:rgba(48,209,88,.15);color:var(--green)}
 .chip-mid{background:rgba(255,255,255,.08);color:var(--sub)}
 .chip-down{background:rgba(255,69,58,.15);color:var(--red)}
 .form-group{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-top:6px}
-.c-input{background:var(--card);border:1.5px solid rgba(255,255,255,.08);color:var(--text);font-size:16px;padding:15px 16px;border-radius:14px;width:100%;transition:border-color .2s}
+.c-input{background:var(--card);border:1.5px solid rgba(255,255,255,.08);color:var(--text);font-size:16px;padding:15px 16px;border-radius:14px;width:100%;transition:border-color .2s;-webkit-appearance:none}
 .c-input:focus{outline:none;border-color:var(--accent)}
 .c-input::placeholder{color:var(--sub)}
 .btn-full{width:100%;max-width:320px;padding:16px;border-radius:14px;font-size:16px;font-weight:700;border:none;cursor:pointer}
 .btn-full.pri{background:var(--accent);color:#000}
 .btn-full.sec{background:var(--card2);color:var(--sub);font-weight:500}
 
+/* CONFETTI */
+.confetti{position:absolute;width:10px;height:10px;top:-20px;opacity:0;pointer-events:none;z-index:1}
+@keyframes confettiFall{
+  0%{opacity:1;transform:translateY(0) rotate(0)}
+  100%{opacity:0;transform:translateY(110vh) rotate(720deg)}
+}
+
 /* STATS */
 .section-label{font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin:22px 0 10px;padding:0 2px}
 .section-label:first-child{margin-top:4px}
-.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .kpi{background:var(--card);border-radius:14px;padding:16px 10px;text-align:center}
 .kpi-n{font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-.5px}
 .kpi-l{font-size:11px;color:var(--sub);margin-top:3px;font-weight:500}
 
 /* PODIUM */
-.podium{display:flex;gap:8px;margin-bottom:4px}
+.podium{display:flex;gap:8px}
 .pod-card{flex:1;background:var(--card);border-radius:14px;padding:10px 8px;text-align:center;position:relative;overflow:hidden}
-.pod-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:6px}
-.pod-rank{position:absolute;top:8px;left:8px;font-size:16px}
+.pod-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:5px}
+.pod-rank{position:absolute;top:8px;left:8px;font-size:16px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
 .pod-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .pod-score{font-size:11px;color:var(--sub)}
 
-/* STREAK */
-.streak-row{background:var(--card);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.streak-row img{width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0}
+/* STREAK / LIST ROW */
+.streak-row{background:var(--card);border-radius:14px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.streak-row img{width:40px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0}
 .streak-info{flex:1;min-width:0}
 .streak-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .streak-sub{font-size:12px;color:var(--sub);margin-top:2px}
-.streak-badge{font-size:22px;flex-shrink:0}
+.streak-badge{font-size:20px;flex-shrink:0}
 
 /* PHOTO STAT */
 .pstat{background:var(--card);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.pstat-top{display:flex;gap:12px;align-items:center;padding:14px}
-.pstat-top img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex-shrink:0}
-.pstat-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.pstat-top{display:flex;gap:12px;align-items:center;padding:12px}
+.pstat-top img{width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.pstat-name{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
 .pstat-sub{font-size:12px;color:var(--sub)}
 .pstat-status{margin-left:auto;font-size:18px;flex-shrink:0}
-.vote-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:0 14px 8px}
+.vote-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:0 12px 8px}
 .seg-up{background:var(--green)}.seg-mid{background:var(--gray)}.seg-down{background:var(--red)}
-.vote-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:0 14px 12px}
+.vote-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:0 12px 12px}
 
 /* PEOPLE */
-.person-row{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer;transition:transform .15s}
+.person-row{background:var(--card);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;transition:transform .15s}
 .person-row:active{transform:scale(.98)}
-.person-name{font-size:15px;font-weight:600;margin-bottom:3px}
-.person-meta{font-size:12px;color:var(--sub)}
+.person-left{display:flex;gap:12px;align-items:center;flex:1;min-width:0}
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.person-meta-wrap{min-width:0;flex:1}
+.person-name{font-size:15px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person-meta{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-chips{display:flex;gap:6px;flex-shrink:0}
 .p-chip{font-size:12px;background:var(--card2);padding:5px 10px;border-radius:20px;font-weight:500}
 .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--accent);font-size:15px;font-weight:600;cursor:pointer;padding:0;margin-bottom:18px}
-.person-detail-header{background:var(--card);border-radius:16px;padding:20px;text-align:center;margin-bottom:4px}
-.pd-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.person-detail-header{background:var(--card);border-radius:16px;padding:24px 20px 20px;text-align:center;margin-bottom:4px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.avatar-large{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin-bottom:4px}
+.pd-name{font-size:22px;font-weight:700}
 .pd-meta{font-size:13px;color:var(--sub)}
 
 /* EMPTY */
-.empty{text-align:center;padding:60px 20px;color:var(--sub)}
+.empty{text-align:center;padding:40px 20px;color:var(--sub)}
 .empty-icon{font-size:44px;margin-bottom:12px}
+.empty-btn{background:var(--accent);color:#000;border:none;padding:12px 28px;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px}
 
-/* ANIMATIONS */
+/* ANIMS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.25)}100%{transform:scale(1)}}
@@ -160,7 +173,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Di
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="adminMode">
   <div class="tabs">
     <div class="tab active" onclick="showTab('photos')">📷 Photos</div>
@@ -169,36 +181,27 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Di
     <div class="tab" onclick="showTab('photostats')">📊 Stats</div>
     <div class="tab" onclick="showTab('people')">👥 People</div>
   </div>
-  <div class="scroll-content">
-    <div id="tab-photos" class="view active">
-      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-        <div class="icon">📤</div>
-        <div class="u-title">Upload Photos</div>
-        <div class="u-sub">Camera Roll · Take Photo · Files</div>
-      </div>
-      <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
-      <div class="photo-list" id="photoList"></div>
-    </div>
-    <div id="tab-overall" class="view"></div>
-    <div id="tab-weekly" class="view"></div>
-    <div id="tab-photostats" class="view"></div>
-    <div id="tab-people" class="view"></div>
+  <div id="tab-photos" class="view active">
+    <div id="uploadZone"></div>
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+    <div class="photo-list" id="photoList"></div>
   </div>
+  <div id="tab-overall" class="view"></div>
+  <div id="tab-weekly" class="view"></div>
+  <div id="tab-photostats" class="view"></div>
+  <div id="tab-people" class="view"></div>
 </div>
 
-<!-- RATING -->
-<div id="ratingMode" style="display:none">
-  <div id="ratingInner"></div>
-</div>
+<div id="ratingMode" style="display:none"><div id="ratingInner"></div></div>
 
 <script>
 let photos=[], sessions=[], mode='admin', ratingStarted=false, currentSession=null;
+const AVATAR_COLORS=['#0a84ff','#30d158','#bf5af2','#ff375f','#ff9f0a','#64d2ff','#ffd60a','#ff453a'];
 
 function save(){try{localStorage.setItem('ri_p',JSON.stringify(photos));localStorage.setItem('ri_s',JSON.stringify(sessions));}catch(e){}}
 function load(){try{const p=localStorage.getItem('ri_p');if(p)photos=JSON.parse(p);const s=localStorage.getItem('ri_s');if(s)sessions=JSON.parse(s);}catch(e){}}
-load(); renderPhotoList();
+load();renderPhotoList();
 
-// MODE
 function setMode(m){
   mode=m;
   document.getElementById('btnAdmin').classList.toggle('active',m==='admin');
@@ -209,7 +212,6 @@ function setMode(m){
   else renderPhotoList();
 }
 
-// TABS
 function showTab(name){
   const names=['photos','overall','weekly','photostats','people'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
@@ -221,7 +223,6 @@ function showTab(name){
   if(name==='people')renderPeople();
 }
 
-// UPLOAD
 function handleFiles(files){Array.from(files).forEach(f=>compressAndAdd(f));}
 function compressAndAdd(file){
   const img=new Image(),url=URL.createObjectURL(file);
@@ -235,10 +236,21 @@ function compressAndAdd(file){
   };img.src=url;
 }
 
-// PHOTO LIST
 function renderPhotoList(){
+  const up=document.getElementById('uploadZone');
+  const compact=photos.length>0;
+  up.innerHTML=compact?`
+    <div class="upload-zone compact" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">📤</div>
+      <div><div class="u-title">Add more photos</div><div class="u-sub">${photos.length} photo${photos.length!==1?'s':''} so far</div></div>
+    </div>`:`
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">📤</div>
+      <div class="u-title">Upload Photos</div>
+      <div class="u-sub">Camera Roll · Take Photo · Files</div>
+    </div>`;
   const el=document.getElementById('photoList');
-  if(!photos.length){el.innerHTML='<div class="empty"><div class="empty-icon">📷</div><p>No photos yet.<br>Upload some above!</p></div>';return;}
+  if(!photos.length){el.innerHTML='<div class="empty"><div class="empty-icon">📷</div><p>No photos yet.<br>Upload some to get started!</p></div>';return;}
   el.innerHTML=photos.map((p,i)=>`
     <div class="photo-card">
       <img src="${p.src}">
@@ -253,31 +265,19 @@ function photoStatus(id){return sessions.some(s=>s.votes&&s.votes[id])?'✅':'�
 function updateCaption(i,v){photos[i].caption=v;save();}
 function deletePhoto(i){if(confirm('Delete this photo?')){photos.splice(i,1);save();renderPhotoList();}}
 
-// RATING
 function renderRating(){
   const el=document.getElementById('ratingInner');
-  if(!photos.length){
-    el.innerHTML=`<div class="center-screen"><div class="s-icon">📷</div><div class="s-title">No Photos</div><p class="s-sub">Add photos in Admin mode first.</p></div>`;return;
-  }
+  if(!photos.length){el.innerHTML=`<div class="center-screen"><div class="s-icon">📷</div><div class="s-title">No Photos</div><p class="s-sub">Add photos in Admin mode first.</p><button class="s-btn-sec" onclick="setMode('admin')">Go to Admin</button></div>`;return;}
   if(!ratingStarted){
     const unrated=photos.filter(p=>!sessions.some(s=>s.votes[p.id])).length;
-    el.innerHTML=`<div class="center-screen fade-up">
-      <div class="s-icon">⭐</div>
-      <div class="s-title">Ready to Rate</div>
-      <p class="s-sub">${photos.length} photo${photos.length!==1?'s':''} · ${unrated} not yet rated</p>
-      <button class="s-btn" onclick="startRating()">Start Rating</button>
-    </div>`;return;
+    el.innerHTML=`<div class="center-screen fade-up"><div class="s-icon">⭐</div><div class="s-title">Ready to Rate</div><p class="s-sub">${photos.length} photo${photos.length!==1?'s':''} · ${unrated} not yet rated</p><button class="s-btn" onclick="startRating()">Start Rating</button></div>`;return;
   }
   const unrated=photos.filter(p=>!currentSession.votes[p.id]);
   if(!unrated.length){showCongrats();return;}
   showRatingPhoto(unrated[0]);
 }
 
-function startRating(){
-  ratingStarted=true;
-  currentSession={ts:Date.now(),votes:{},name:'',phone:''};
-  renderRating();
-}
+function startRating(){ratingStarted=true;currentSession={ts:Date.now(),votes:{},name:'',phone:''};renderRating();}
 
 function showRatingPhoto(p){
   const done=photos.filter(x=>currentSession.votes[x.id]).length;
@@ -301,29 +301,31 @@ function showRatingPhoto(p){
   setTimeout(initDragCaption,50);
 }
 
-function vote(id,type,btn){
-  currentSession.votes[id]=type;
-  btn.classList.add('pop');
-  setTimeout(renderRating,220);
-}
+function vote(id,type,btn){currentSession.votes[id]=type;btn.classList.add('pop');setTimeout(renderRating,220);}
 
-// CONGRATS
 function showCongrats(){
   const v=currentSession.votes;
   const ups=Object.values(v).filter(x=>x==='up').length;
   const mids=Object.values(v).filter(x=>x==='mid').length;
   const downs=Object.values(v).filter(x=>x==='down').length;
+  const colors=['#ffd60a','#30d158','#0a84ff','#bf5af2','#ff375f','#ff9f0a','#64d2ff'];
+  let confetti='';
+  for(let i=0;i<40;i++){
+    const left=Math.random()*100, delay=Math.random()*1.5, dur=2+Math.random()*1.5, color=colors[Math.floor(Math.random()*colors.length)];
+    confetti+=`<div class="confetti" style="left:${left}%;background:${color};animation:confettiFall ${dur}s linear ${delay}s forwards"></div>`;
+  }
   document.getElementById('ratingInner').innerHTML=`
-    <div class="congrats-wrap fade-up">
-      <div class="s-icon" style="margin-top:20px">🎉</div>
-      <div class="s-title">Congratulations!</div>
-      <p class="s-sub">You rated all ${photos.length} photos!</p>
-      <div class="score-row">
+    <div class="congrats-wrap">
+      ${confetti}
+      <div class="s-icon fade-up" style="margin-top:20px">🎉</div>
+      <div class="s-title fade-up">Congratulations!</div>
+      <p class="s-sub fade-up">You rated all ${photos.length} photos!</p>
+      <div class="score-row fade-up">
         <div class="score-chip chip-up">👍 ${ups}</div>
         <div class="score-chip chip-mid">🤷 ${mids}</div>
         <div class="score-chip chip-down">👎 ${downs}</div>
       </div>
-      <div class="form-group">
+      <div class="form-group fade-up">
         <input class="c-input" id="inp-name" placeholder="Your name" type="text" autocomplete="name">
         <input class="c-input" id="inp-phone" placeholder="Phone number (optional)" type="tel" autocomplete="tel">
         <button class="btn-full pri" onclick="saveSession()">Save & Finish ✅</button>
@@ -332,15 +334,8 @@ function showCongrats(){
     </div>`;
 }
 
-function saveSession(){
-  currentSession.name=document.getElementById('inp-name').value.trim()||'Anonymous';
-  currentSession.phone=document.getElementById('inp-phone').value.trim();
-  sessions.push({...currentSession});save();finishRating();
-}
-function skipSession(){
-  currentSession.name='Anonymous';currentSession.phone='';
-  sessions.push({...currentSession});save();finishRating();
-}
+function saveSession(){currentSession.name=document.getElementById('inp-name').value.trim()||'Anonymous';currentSession.phone=document.getElementById('inp-phone').value.trim();sessions.push({...currentSession});save();finishRating();}
+function skipSession(){currentSession.name='Anonymous';currentSession.phone='';sessions.push({...currentSession});save();finishRating();}
 function finishRating(){
   ratingStarted=false;currentSession=null;
   document.getElementById('ratingInner').innerHTML=`
@@ -353,7 +348,6 @@ function finishRating(){
     </div>`;
 }
 
-// DRAG CAPTION
 function initDragCaption(){
   const bar=document.getElementById('captionBar');if(!bar)return;
   const wrap=bar.parentElement;let drag=false,sY=0,sTop=0;
@@ -362,20 +356,22 @@ function initDragCaption(){
   window.addEventListener('touchend',()=>{drag=false;});
 }
 
-// STATS HELPERS
 function filtSess(weekly){if(!weekly)return sessions;const c=Date.now()-7*24*60*60*1000;return sessions.filter(s=>s.ts>=c);}
 function pVotes(pid,sess){const up=sess.filter(s=>s.votes[pid]==='up').length,mid=sess.filter(s=>s.votes[pid]==='mid').length,down=sess.filter(s=>s.votes[pid]==='down').length;return{up,mid,down,total:up+mid+down};}
 function maxStreak(pid){const ord=[...sessions].sort((a,b)=>a.ts-b.ts);let max=0,cur=0;ord.forEach(s=>{if(s.votes[pid]==='up'){cur++;max=Math.max(max,cur);}else cur=0;});return max;}
 
-// OVERALL
+function emptyStats(msg){return `<div class="empty"><div class="empty-icon">📊</div><p>${msg}</p><button class="empty-btn" onclick="setMode('rating')">Start Rating</button></div>`;}
+
 function renderOverall(weekly){
   const key=weekly?'tab-weekly':'tab-overall';
   const sess=filtSess(weekly);
+  if(!photos.length){document.getElementById(key).innerHTML='<div class="empty"><div class="empty-icon">📷</div><p>No photos yet.<br>Add some first!</p></div>';return;}
+  if(!sess.length){document.getElementById(key).innerHTML=emptyStats(weekly?'No ratings this week yet.':'No ratings yet.<br>Start by rating your photos!');return;}
   const label=weekly?'Last 7 Days':'All Time';
   const totalVotes=sess.reduce((a,s)=>a+Object.keys(s.votes).length,0);
   const scored=photos.map(p=>({p,v:pVotes(p.id,sess)}));
-  const top3up=[...scored].sort((a,b)=>b.v.up-a.v.up).slice(0,3);
-  const top3dn=[...scored].sort((a,b)=>b.v.down-a.v.down).slice(0,3);
+  const top3up=[...scored].filter(x=>x.v.up>0).sort((a,b)=>b.v.up-a.v.up).slice(0,3);
+  const top3dn=[...scored].filter(x=>x.v.down>0).sort((a,b)=>b.v.down-a.v.down).slice(0,3);
   const streaks=photos.map(p=>({p,s:maxStreak(p.id)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
   document.getElementById(key).innerHTML=`
     <div class="section-label">${label}</div>
@@ -384,20 +380,9 @@ function renderOverall(weekly){
       <div class="kpi"><div class="kpi-n">${totalVotes}</div><div class="kpi-l">Votes</div></div>
       <div class="kpi"><div class="kpi-n">${photos.length}</div><div class="kpi-l">Photos</div></div>
     </div>
-    <div class="section-label">🏆 Top 3 Liked</div>
-    <div class="podium">${top3up.map((x,i)=>podCard(x.p,x.v,['🥇','🥈','🥉'][i],'up')).join('')}</div>
-    <div class="section-label">💀 Top 3 Disliked</div>
-    <div class="podium">${top3dn.map((x,i)=>podCard(x.p,x.v,['🥇','🥈','🥉'][i],'dn')).join('')}</div>
-    <div class="section-label">🔥 Streak Leaders</div>
-    ${streaks.slice(0,5).map(x=>`
-      <div class="streak-row">
-        <img src="${x.p.src}">
-        <div class="streak-info">
-          <div class="streak-name">${esc(x.p.caption)||'Photo '+(photos.indexOf(x.p)+1)}</div>
-          <div class="streak-sub">${x.s} consecutive 👍</div>
-        </div>
-        <div class="streak-badge">🔥${x.s}</div>
-      </div>`).join('')||'<div class="empty" style="padding:20px 0"><p>No streaks yet</p></div>'}`;
+    ${top3up.length?`<div class="section-label">🏆 Top 3 Liked</div><div class="podium">${top3up.map((x,i)=>podCard(x.p,x.v,['🥇','🥈','🥉'][i],'up')).join('')}</div>`:''}
+    ${top3dn.length?`<div class="section-label">💀 Top 3 Disliked</div><div class="podium">${top3dn.map((x,i)=>podCard(x.p,x.v,['🥇','🥈','🥉'][i],'dn')).join('')}</div>`:''}
+    ${streaks.length?`<div class="section-label">🔥 Streak Leaders</div>${streaks.slice(0,5).map(x=>`<div class="streak-row"><img src="${x.p.src}"><div class="streak-info"><div class="streak-name">${esc(x.p.caption)||'Photo '+(photos.indexOf(x.p)+1)}</div><div class="streak-sub">${x.s} consecutive 👍</div></div><div class="streak-badge">🔥${x.s}</div></div>`).join('')}`:''}`;
 }
 
 function podCard(p,v,medal,type){
@@ -406,10 +391,9 @@ function podCard(p,v,medal,type){
   return `<div class="pod-card"><span class="pod-rank">${medal}</span><img src="${p.src}"><div class="pod-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div><div class="pod-score">${sc} · ${pct}%</div></div>`;
 }
 
-// PHOTO STATS
 function renderPhotoStats(){
   const el=document.getElementById('tab-photostats');
-  if(!photos.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>No data yet.</p></div>';return;}
+  if(!photos.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>No photos yet.</p></div>';return;}
   const sc=photos.map(p=>({p,v:pVotes(p.id,sessions)})).sort((a,b)=>b.v.up-a.v.up);
   el.innerHTML=sc.map(({p,v})=>{
     const uP=v.total?Math.round(v.up/v.total*100):0,mP=v.total?Math.round(v.mid/v.total*100):0,dP=v.total?100-uP-mP:0;
@@ -417,7 +401,7 @@ function renderPhotoStats(){
     return `<div class="pstat">
       <div class="pstat-top">
         <img src="${p.src}">
-        <div>
+        <div style="min-width:0;flex:1">
           <div class="pstat-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div>
           <div class="pstat-sub">${v.total} votes · ${uP}% 👍${str>=3?' · 🔥'+str:''}</div>
         </div>
@@ -429,20 +413,31 @@ function renderPhotoStats(){
   }).join('');
 }
 
-// PEOPLE
+function avatarFor(name){
+  const n=(name||'Anonymous').trim();
+  const init=n[0]?n[0].toUpperCase():'?';
+  let hash=0;for(let i=0;i<n.length;i++)hash=(hash*31+n.charCodeAt(i))&0xffffffff;
+  const color=AVATAR_COLORS[Math.abs(hash)%AVATAR_COLORS.length];
+  return {init,color};
+}
+
 function renderPeople(detailIdx=null){
   const el=document.getElementById('tab-people');
   if(detailIdx!==null){renderPersonDetail(detailIdx);return;}
-  if(!sessions.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>No sessions yet.</p></div>';return;}
+  if(!sessions.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>No sessions yet.<br>Start rating to see participants!</p></div>';return;}
   const sorted=[...sessions].map((s,i)=>({s,i})).sort((a,b)=>b.s.ts-a.s.ts);
   el.innerHTML=`<div class="section-label">All Participants (${sessions.length})</div>`+
     sorted.map(({s,i})=>{
       const ups=Object.values(s.votes).filter(v=>v==='up').length;
       const dns=Object.values(s.votes).filter(v=>v==='down').length;
+      const a=avatarFor(s.name);
       return `<div class="person-row" onclick="renderPeople(${i})">
-        <div>
-          <div class="person-name">${esc(s.name)||'Anonymous'}</div>
-          <div class="person-meta">${s.phone||'No number'} · ${new Date(s.ts).toLocaleDateString('de-DE')}</div>
+        <div class="person-left">
+          <div class="avatar" style="background:${a.color}">${a.init}</div>
+          <div class="person-meta-wrap">
+            <div class="person-name">${esc(s.name)||'Anonymous'}</div>
+            <div class="person-meta">${s.phone||'No number'} · ${new Date(s.ts).toLocaleDateString('de-DE')}</div>
+          </div>
         </div>
         <div class="p-chips"><div class="p-chip">👍 ${ups}</div><div class="p-chip">👎 ${dns}</div></div>
       </div>`;
@@ -455,13 +450,15 @@ function renderPersonDetail(idx){
   const ups=Object.values(s.votes).filter(v=>v==='up').length;
   const mids=Object.values(s.votes).filter(v=>v==='mid').length;
   const dns=Object.values(s.votes).filter(v=>v==='down').length;
+  const a=avatarFor(s.name);
   el.innerHTML=`
     <button class="back-btn" onclick="renderPeople()">‹ Back</button>
     <div class="person-detail-header">
+      <div class="avatar-large" style="background:${a.color}">${a.init}</div>
       <div class="pd-name">${esc(s.name)||'Anonymous'}</div>
       <div class="pd-meta">${s.phone||'No phone'}</div>
-      <div class="pd-meta" style="margin-top:4px">${new Date(s.ts).toLocaleString('de-DE')}</div>
-      <div class="score-row" style="margin-top:12px">
+      <div class="pd-meta">${new Date(s.ts).toLocaleString('de-DE')}</div>
+      <div class="score-row" style="margin-top:8px">
         <div class="score-chip chip-up">👍 ${ups}</div>
         <div class="score-chip chip-mid">🤷 ${mids}</div>
         <div class="score-chip chip-down">👎 ${dns}</div>
@@ -471,7 +468,7 @@ function renderPersonDetail(idx){
     ${photos.map(p=>{
       const v=s.votes[p.id];
       const em=v==='up'?'👍':v==='mid'?'🤷':v==='down'?'👎':'—';
-      return `<div class="streak-row"><img src="${p.src}"><div class="streak-info"><div class="streak-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div></div><div style="font-size:30px">${em}</div></div>`;
+      return `<div class="streak-row"><img src="${p.src}"><div class="streak-info"><div class="streak-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div></div><div style="font-size:26px">${em}</div></div>`;
     }).join('')}`;
 }
 
