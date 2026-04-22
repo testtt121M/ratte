@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+<meta name="apple-mobile-web-app-title" content="Rate It">
+<title>Rate It</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0a;--card:#1a1a1a;--card2:#222;--accent:#f0c040;--text:#fff;--sub:#888;--green:#4ade80;--red:#f87171;--gray:#6b7280;--blue:#60a5fa}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--bg);border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
+.nav-title{font-size:18px;font-weight:700}
+.nav-btn{background:none;border:1px solid #333;color:var(--text);padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer}
+.nav-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid #222;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:11px 16px;text-align:center;font-size:13px;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+/* VIEWS */
+.view{display:none;padding:16px}
+.view.active{display:block}
+/* UPLOAD */
+.upload-zone{border:2px dashed #333;border-radius:16px;padding:32px;text-align:center;cursor:pointer;margin-bottom:20px}
+.upload-zone .icon{font-size:40px;margin-bottom:8px}
+.upload-zone p{color:var(--sub);font-size:14px}
+#fileInput{display:none}
+/* PHOTO CARDS */
+.photo-list{display:flex;flex-direction:column;gap:12px}
+.photo-card{background:var(--card);border-radius:16px;overflow:hidden;display:flex;gap:12px;align-items:center;padding:12px}
+.photo-card img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.photo-card-info{flex:1;min-width:0}
+.photo-card-caption{background:#222;border:none;color:var(--text);font-size:14px;width:100%;padding:7px 10px;border-radius:8px;margin-top:6px}
+.photo-card-caption::placeholder{color:var(--sub)}
+.photo-card-name{font-size:12px;color:var(--sub)}
+.del-btn{background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;padding:6px;flex-shrink:0}
+/* RATING */
+#ratingView{padding:0;position:relative}
+.rating-photo-wrap{position:relative;width:100%;height:calc(100dvh - 56px);overflow:hidden;background:#000}
+.rating-photo-wrap img{width:100%;height:100%;object-fit:contain}
+.caption-bar{position:absolute;left:0;right:0;text-align:center;cursor:grab;user-select:none;touch-action:none}
+.caption-bar span{background:rgba(0,0,0,.55);color:#fff;font-size:26px;font-weight:800;padding:12px 20px;display:block;width:100%;word-break:break-word;text-shadow:0 1px 6px #000}
+.reaction-bar{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:12px 20px 28px;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.react-btn{font-size:44px;background:none;border:none;cursor:pointer;transition:transform .1s;padding:4px}
+.react-btn:active{transform:scale(.85)}
+.progress-bar{position:absolute;top:0;left:0;height:3px;background:var(--accent);transition:width .3s}
+.photo-counter{position:absolute;top:10px;right:14px;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:20px;font-size:12px}
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--sub)}
+.empty .big{font-size:48px;margin-bottom:12px}
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn-sec{background:#222;color:var(--text);border:none;padding:12px 20px;border-radius:50px;font-size:14px;cursor:pointer}
+.btn-pri{background:var(--accent);color:#000;border:none;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer}
+/* SCREENS */
+.start-screen,.done-screen,.congrats-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100dvh - 56px);gap:14px;padding:30px 20px;text-align:center}
+.big-icon{font-size:64px}
+.screen-title{font-size:24px;font-weight:700}
+.screen-sub{color:var(--sub);font-size:15px;line-height:1.5}
+.start-btn{background:var(--accent);color:#000;border:none;padding:14px 40px;border-radius:50px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}
+/* CONGRATS FORM */
+.congrats-screen{gap:12px}
+.congrats-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.congrats-input{background:#222;border:1px solid #333;color:var(--text);font-size:16px;padding:13px 16px;border-radius:12px;width:100%}
+.congrats-input::placeholder{color:var(--sub)}
+.score-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}
+.chip{background:var(--card2);padding:6px 14px;border-radius:20px;font-size:14px}
+.chip.green{background:rgba(74,222,128,.15);color:var(--green)}
+.chip.red{background:rgba(248,113,113,.15);color:var(--red)}
+.chip.gray{background:#222;color:var(--sub)}
+/* STATS */
+.section-title{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px}
+.section-title:first-child{margin-top:0}
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.kpi{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center}
+.kpi-num{font-size:26px;font-weight:700;color:var(--accent)}
+.kpi-label{font-size:11px;color:var(--sub);margin-top:3px}
+/* PODIUM */
+.podium{display:flex;gap:8px;margin-bottom:4px}
+.podium-card{flex:1;background:var(--card);border-radius:14px;padding:10px 8px;text-align:center;position:relative;overflow:hidden}
+.podium-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:6px}
+.podium-rank{position:absolute;top:8px;left:8px;font-size:18px}
+.podium-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podium-score{font-size:12px;color:var(--sub)}
+/* STREAK CARD */
+.streak-card{background:var(--card);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.streak-card img{width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.streak-info{flex:1}
+.streak-name{font-size:14px;font-weight:600}
+.streak-sub{font-size:12px;color:var(--sub)}
+.streak-badge{font-size:22px;flex-shrink:0}
+/* PHOTO STAT */
+.pstat{background:var(--card);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.pstat-header{display:flex;gap:12px;align-items:center;padding:12px}
+.pstat-header img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.pstat-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.pstat-sub{font-size:12px;color:var(--sub)}
+.vote-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:0 12px 6px}
+.vote-bar .seg-up{background:var(--green)}
+.vote-bar .seg-mid{background:var(--gray)}
+.vote-bar .seg-down{background:var(--red)}
+.vote-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:0 12px 12px}
+/* PEOPLE LIST */
+.person-row{background:var(--card);border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer}
+.person-name{font-size:15px;font-weight:600}
+.person-phone{font-size:12px;color:var(--sub);margin-top:2px}
+.person-chips{display:flex;gap:6px}
+.person-chip{font-size:12px;background:#222;padding:4px 10px;border-radius:20px}
+/* PERSON DETAIL */
+.back-btn{background:none;border:none;color:var(--accent);font-size:15px;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.person-header{background:var(--card);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center}
+.person-header h2{font-size:20px;font-weight:700}
+.person-header p{color:var(--sub);font-size:14px;margin-top:4px}
+/* ANIM */
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}
+.pop{animation:pop .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.slide-in{animation:slideIn .25s ease}
+@keyframes confetti{0%{transform:translateY(-20px);opacity:1}100%{transform:translateY(80px);opacity:0}}
+</style>
+</head>
+<body>
+<div class="nav">
+  <span class="nav-title">⭐ Rate It</span>
+  <button class="nav-btn active" id="modeToggle" onclick="toggleMode()">Admin</button>
+</div>
+
+<!-- ADMIN -->
+<div id="adminMode">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('photos')">📷 Photos</div>
+    <div class="tab" onclick="showTab('overall')">🏆 Overall</div>
+    <div class="tab" onclick="showTab('weekly')">📅 Weekly</div>
+    <div class="tab" onclick="showTab('photostats')">📊 Photo Stats</div>
+    <div class="tab" onclick="showTab('people')">👥 People</div>
+  </div>
+  <div id="tab-photos" class="view active">
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">📤</div>
+      <p>Tap to upload photos<br><small>From Camera Roll or take a photo</small></p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+    <div class="photo-list" id="photoList"></div>
+  </div>
+  <div id="tab-overall" class="view"></div>
+  <div id="tab-weekly" class="view"></div>
+  <div id="tab-photostats" class="view"></div>
+  <div id="tab-people" class="view"></div>
+</div>
+
+<!-- RATING -->
+<div id="ratingMode" style="display:none">
+  <div id="ratingInner"></div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let photos = [], sessions = [], mode = 'admin', ratingIndex = 0, ratingStarted = false;
+let currentSession = null; // {ts, votes:{photoId: reaction}, name, phone}
+
+function save() {
+  try {
+    localStorage.setItem('rateit_photos', JSON.stringify(photos));
+    localStorage.setItem('rateit_sessions', JSON.stringify(sessions));
+  } catch(e){}
+}
+function load() {
+  try {
+    const p = localStorage.getItem('rateit_photos'); if(p) photos = JSON.parse(p);
+    const s = localStorage.getItem('rateit_sessions'); if(s) sessions = JSON.parse(s);
+  } catch(e){}
+}
+load();
+renderPhotoList();
+
+// ── MODE TOGGLE ────────────────────────────────────────────────────────────
+function toggleMode() {
+  mode = mode === 'admin' ? 'rating' : 'admin';
+  const btn = document.getElementById('modeToggle');
+  if(mode === 'rating') {
+    btn.textContent = 'Admin'; btn.classList.remove('active');
+    document.getElementById('adminMode').style.display = 'none';
+    document.getElementById('ratingMode').style.display = 'block';
+    ratingStarted = false; currentSession = null;
+    renderRating();
+  } else {
+    btn.textContent = 'Admin'; btn.classList.add('active');
+    document.getElementById('ratingMode').style.display = 'none';
+    document.getElementById('adminMode').style.display = 'block';
+    renderPhotoList();
+  }
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', ['photos','overall','weekly','photostats','people'][i]===name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='overall') renderOverall(false);
+  if(name==='weekly') renderOverall(true);
+  if(name==='photostats') renderPhotoStats();
+  if(name==='people') renderPeople();
+}
+
+// ── FILE UPLOAD ────────────────────────────────────────────────────────────
+function handleFiles(files) { Array.from(files).forEach(f => compressAndAdd(f)); }
+function compressAndAdd(file) {
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = () => {
+    const MAX=800; let w=img.width,h=img.height;
+    if(w>MAX||h>MAX){const r=Math.min(MAX/w,MAX/h);w=Math.round(w*r);h=Math.round(h*r);}
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    photos.push({id:'p_'+Date.now()+'_'+Math.random().toString(36).slice(2),src:c.toDataURL('image/jpeg',.75),caption:''});
+    URL.revokeObjectURL(url); save(); renderPhotoList();
+  }; img.src=url;
+}
+
+// ── ADMIN PHOTO LIST ───────────────────────────────────────────────────────
+function renderPhotoList() {
+  const el=document.getElementById('photoList');
+  if(!photos.length){el.innerHTML='<div class="empty"><div class="big">📷</div><p>No photos yet.</p></div>';return;}
+  el.innerHTML=photos.map((p,i)=>`
+    <div class="photo-card">
+      <img src="${p.src}">
+      <div class="photo-card-info">
+        <div class="photo-card-name">${photoStatus(p.id)} Photo ${i+1}</div>
+        <input class="photo-card-caption" placeholder="Caption or emoji..." value="${esc(p.caption)}" oninput="updateCaption(${i},this.value)">
+      </div>
+      <button class="del-btn" onclick="deletePhoto(${i})">🗑</button>
+    </div>`).join('');
+}
+function photoStatus(id) {
+  return sessions.some(s=>s.votes&&s.votes[id]) ? '✅' : '⏳';
+}
+function updateCaption(i,val){photos[i].caption=val;save();}
+function deletePhoto(i){if(confirm('Delete?')){photos.splice(i,1);save();renderPhotoList();}}
+
+// ── RATING ─────────────────────────────────────────────────────────────────
+function renderRating() {
+  const el=document.getElementById('ratingInner');
+  if(!photos.length){
+    el.innerHTML=`<div class="start-screen"><div class="big-icon">📷</div><h2 class="screen-title">No Photos</h2><p class="screen-sub">Add photos in Admin mode first.</p></div>`;return;
+  }
+  if(!ratingStarted) {
+    el.innerHTML=`<div class="start-screen">
+      <div class="big-icon">⭐</div>
+      <h2 class="screen-title">Ready to Rate</h2>
+      <p class="screen-sub">${photos.length} photo${photos.length!==1?'s':''} to rate</p>
+      <button class="start-btn" onclick="startRating()">Start Rating</button>
+    </div>`;return;
+  }
+  const unrated = photos.filter(p=>!currentSession.votes[p.id]);
+  if(!unrated.length){showCongrats();return;}
+  showRatingPhoto(unrated[0]);
+}
+
+function startRating() {
+  ratingStarted=true;
+  currentSession={ts:Date.now(),votes:{},name:'',phone:''};
+  renderRating();
+}
+
+function showRatingPhoto(p) {
+  const done=photos.filter(x=>currentSession.votes[x.id]).length;
+  const pct=Math.round((done/photos.length)*100);
+  document.getElementById('ratingInner').innerHTML=`
+    <div class="rating-photo-wrap slide-in">
+      <div class="progress-bar" style="width:${pct}%"></div>
+      <img src="${p.src}">
+      <div class="photo-counter">${done}/${photos.length}</div>
+      ${p.caption?`<div class="caption-bar" id="captionBar" style="top:50%;transform:translateY(-50%)"><span>${esc(p.caption)}</span></div>`:''}
+      <div class="reaction-bar">
+        <button class="react-btn" onclick="vote('${p.id}','down')">👎</button>
+        <button class="react-btn" onclick="vote('${p.id}','mid')">🤷</button>
+        <button class="react-btn" onclick="vote('${p.id}','up')">👍</button>
+      </div>
+    </div>`;
+  setTimeout(initDragCaption,50);
+}
+
+function vote(id,type) {
+  currentSession.votes[id]=type;
+  setTimeout(renderRating,200);
+}
+
+// ── CONGRATS ───────────────────────────────────────────────────────────────
+function showCongrats() {
+  const ups=Object.values(currentSession.votes).filter(v=>v==='up').length;
+  const mids=Object.values(currentSession.votes).filter(v=>v==='mid').length;
+  const downs=Object.values(currentSession.votes).filter(v=>v==='down').length;
+  document.getElementById('ratingInner').innerHTML=`
+    <div class="congrats-screen slide-in">
+      <div class="big-icon">🎉</div>
+      <h2 class="screen-title">Congratulations!</h2>
+      <p class="screen-sub">You rated all ${photos.length} photos!</p>
+      <div class="score-chips">
+        <div class="chip green">👍 ${ups}</div>
+        <div class="chip gray">🤷 ${mids}</div>
+        <div class="chip red">👎 ${downs}</div>
+      </div>
+      <div class="congrats-form">
+        <input class="congrats-input" id="inp-name" placeholder="Your name" type="text">
+        <input class="congrats-input" id="inp-phone" placeholder="Phone number (optional)" type="tel">
+        <button class="btn-pri" onclick="saveSession()">Save & Finish ✅</button>
+        <button class="btn-sec" onclick="skipSession()">Skip</button>
+      </div>
+    </div>`;
+}
+
+function saveSession() {
+  currentSession.name = document.getElementById('inp-name').value.trim() || 'Anonymous';
+  currentSession.phone = document.getElementById('inp-phone').value.trim();
+  sessions.push({...currentSession});
+  save(); finishRating();
+}
+function skipSession() {
+  currentSession.name='Anonymous'; currentSession.phone='';
+  sessions.push({...currentSession});
+  save(); finishRating();
+}
+function finishRating() {
+  ratingStarted=false; currentSession=null;
+  document.getElementById('ratingInner').innerHTML=`
+    <div class="done-screen">
+      <div class="big-icon">✅</div>
+      <h2 class="screen-title">Done!</h2>
+      <p class="screen-sub">Results saved.</p>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn-pri" onclick="toggleMode()">View Stats</button>
+        <button class="btn-sec" onclick="startRating()">Rate Again</button>
+      </div>
+    </div>`;
+}
+
+// ── DRAG CAPTION ───────────────────────────────────────────────────────────
+function initDragCaption() {
+  const bar=document.getElementById('captionBar'); if(!bar)return;
+  const wrap=bar.parentElement; let dragging=false,startY=0,startTop=0;
+  bar.addEventListener('touchstart',e=>{dragging=true;startY=e.touches[0].clientY;startTop=bar.offsetTop;bar.style.transform='none';},{passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const dy=e.touches[0].clientY-startY;
+    const max=wrap.offsetHeight-bar.offsetHeight;
+    bar.style.top=Math.max(0,Math.min(max,startTop+dy))+'px';
+  },{passive:true});
+  window.addEventListener('touchend',()=>{dragging=false;});
+}
+
+// ── STATS HELPERS ──────────────────────────────────────────────────────────
+function filteredSessions(weekly) {
+  if(!weekly) return sessions;
+  const cutoff=Date.now()-7*24*60*60*1000;
+  return sessions.filter(s=>s.ts>=cutoff);
+}
+
+function photoVotes(pid, sess) {
+  const up=sess.filter(s=>s.votes[pid]==='up').length;
+  const mid=sess.filter(s=>s.votes[pid]==='mid').length;
+  const down=sess.filter(s=>s.votes[pid]==='down').length;
+  return {up,mid,down,total:up+mid+down};
+}
+
+function maxConsecUp(pid) {
+  // max consecutive 👍 across sessions ordered by time
+  const ordered=[...sessions].sort((a,b)=>a.ts-b.ts);
+  let max=0,cur=0;
+  ordered.forEach(s=>{
+    if(s.votes[pid]==='up'){cur++;max=Math.max(max,cur);}
+    else cur=0;
+  });
+  return max;
+}
+
+// ── OVERALL / WEEKLY ───────────────────────────────────────────────────────
+function renderOverall(weekly) {
+  const key=weekly?'tab-weekly':'tab-overall';
+  const sess=filteredSessions(weekly);
+  const label=weekly?'Last 7 Days':'All Time';
+  const totalVotes=sess.reduce((a,s)=>a+Object.keys(s.votes).length,0);
+
+  // top 3 liked / disliked
+  const scored=photos.map(p=>({p,v:photoVotes(p.id,sess)}));
+  const top3up=[...scored].sort((a,b)=>b.v.up-a.v.up).slice(0,3);
+  const top3down=[...scored].sort((a,b)=>b.v.down-a.v.down).slice(0,3);
+
+  // best streak per photo
+  const streaks=photos.map(p=>({p,streak:maxConsecUp(p.id)})).sort((a,b)=>b.streak-a.streak);
+
+  document.getElementById(key).innerHTML=`
+    <div class="section-title">${label} — Overview</div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-num">${sess.length}</div><div class="kpi-label">Sessions</div></div>
+      <div class="kpi"><div class="kpi-num">${totalVotes}</div><div class="kpi-label">Total Votes</div></div>
+      <div class="kpi"><div class="kpi-num">${photos.length}</div><div class="kpi-label">Photos</div></div>
+    </div>
+
+    <div class="section-title">🏆 Top 3 Most Liked</div>
+    <div class="podium">${top3up.map((x,i)=>podiumCard(x.p,x.v,['🥇','🥈','🥉'][i],'up')).join('')}</div>
+
+    <div class="section-title">💀 Top 3 Most Disliked</div>
+    <div class="podium">${top3down.map((x,i)=>podiumCard(x.p,x.v,['🥇','🥈','🥉'][i],'down')).join('')}</div>
+
+    <div class="section-title">🔥 Longest 👍 Streak</div>
+    ${streaks.filter(x=>x.streak>0).slice(0,5).map(x=>`
+      <div class="streak-card">
+        <img src="${x.p.src}">
+        <div class="streak-info">
+          <div class="streak-name">${esc(x.p.caption)||'Photo '+(photos.indexOf(x.p)+1)}</div>
+          <div class="streak-sub">${x.streak} consecutive 👍</div>
+        </div>
+        <div class="streak-badge">🔥${x.streak}</div>
+      </div>`).join('') || '<div class="empty" style="padding:20px"><p>No streaks yet</p></div>'}
+  `;
+}
+
+function podiumCard(p,v,medal,type) {
+  const score=type==='up'?v.up:v.down;
+  const pct=v.total?Math.round(score/v.total*100):0;
+  return `<div class="podium-card">
+    <span class="podium-rank">${medal}</span>
+    <img src="${p.src}">
+    <div class="podium-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div>
+    <div class="podium-score">${score} votes · ${pct}%</div>
+  </div>`;
+}
+
+// ── PHOTO STATS ────────────────────────────────────────────────────────────
+function renderPhotoStats() {
+  const el=document.getElementById('tab-photostats');
+  if(!photos.length){el.innerHTML='<div class="empty"><div class="big">📊</div><p>No photos yet.</p></div>';return;}
+  const scored=photos.map(p=>({p,v:photoVotes(p.id,sessions)}));
+  scored.sort((a,b)=>b.v.up-a.v.up);
+  el.innerHTML=scored.map(({p,v},i)=>{
+    const upP=v.total?Math.round(v.up/v.total*100):0;
+    const midP=v.total?Math.round(v.mid/v.total*100):0;
+    const downP=v.total?100-upP-midP:0;
+    const streak=maxConsecUp(p.id);
+    return `<div class="pstat">
+      <div class="pstat-header">
+        <img src="${p.src}">
+        <div>
+          <div class="pstat-title">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div>
+          <div class="pstat-sub">${v.total} votes · ${upP}% 👍${streak>=3?' · 🔥'+streak:''}</div>
+        </div>
+        <div style="margin-left:auto;font-size:18px">${v.total>0?'✅':'⏳'}</div>
+      </div>
+      ${v.total>0?`
+      <div class="vote-bar">
+        <div class="seg-up" style="width:${upP}%"></div>
+        <div class="seg-mid" style="width:${midP}%"></div>
+        <div class="seg-down" style="width:${downP}%"></div>
+      </div>
+      <div class="vote-nums"><span>👍 ${v.up}</span><span>🤷 ${v.mid}</span><span>👎 ${v.down}</span></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── PEOPLE ─────────────────────────────────────────────────────────────────
+function renderPeople(detailIdx=null) {
+  const el=document.getElementById('tab-people');
+  if(detailIdx !== null) { renderPersonDetail(detailIdx); return; }
+  if(!sessions.length){el.innerHTML='<div class="empty"><div class="big">👥</div><p>No sessions yet.</p></div>';return;}
+  const sorted=[...sessions].sort((a,b)=>b.ts-a.ts);
+  el.innerHTML=`
+    <div class="section-title">All Participants (${sessions.length})</div>
+    ${sorted.map((s,i)=>{
+      const ups=Object.values(s.votes).filter(v=>v==='up').length;
+      const downs=Object.values(s.votes).filter(v=>v==='down').length;
+      const idx=sessions.indexOf(s);
+      return `<div class="person-row" onclick="renderPeople(${idx})">
+        <div>
+          <div class="person-name">${esc(s.name)||'Anonymous'}</div>
+          <div class="person-phone">${s.phone||'No number'} · ${new Date(s.ts).toLocaleDateString()}</div>
+        </div>
+        <div class="person-chips">
+          <div class="person-chip">👍 ${ups}</div>
+          <div class="person-chip">👎 ${downs}</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+function renderPersonDetail(idx) {
+  const el=document.getElementById('tab-people');
+  const s=sessions[idx];
+  if(!s){renderPeople();return;}
+  const ups=Object.values(s.votes).filter(v=>v==='up').length;
+  const mids=Object.values(s.votes).filter(v=>v==='mid').length;
+  const downs=Object.values(s.votes).filter(v=>v==='down').length;
+  el.innerHTML=`
+    <button class="back-btn" onclick="renderPeople()">← Back</button>
+    <div class="person-header">
+      <h2>${esc(s.name)||'Anonymous'}</h2>
+      <p>${s.phone||'No phone number'}</p>
+      <p style="margin-top:6px;font-size:13px;color:var(--sub)">${new Date(s.ts).toLocaleString()}</p>
+      <div class="score-chips" style="margin-top:10px">
+        <div class="chip green">👍 ${ups}</div>
+        <div class="chip gray">🤷 ${mids}</div>
+        <div class="chip red">👎 ${downs}</div>
+      </div>
+    </div>
+    <div class="section-title">Their votes</div>
+    ${photos.map(p=>{
+      const v=s.votes[p.id];
+      const emoji=v==='up'?'👍':v==='mid'?'🤷':v==='down'?'👎':'—';
+      return `<div class="streak-card">
+        <img src="${p.src}">
+        <div class="streak-info">
+          <div class="streak-name">${esc(p.caption)||'Photo '+(photos.indexOf(p)+1)}</div>
+        </div>
+        <div style="font-size:28px">${emoji}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
